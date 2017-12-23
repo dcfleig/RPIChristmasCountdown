@@ -1,0 +1,48 @@
+3.17.0
+This program uses FreeImage, a free, open source image library supporting all common bitmap formats. See http://freeimage.sourceforge.net for details
+loaded /home/pi/RpiChristmasCountdown/img/landscape512x32.png 4096x32x24
+loaded /home/pi/RpiChristmasCountdown/img/portal25x13.png 25x13x24
+loaded /home/pi/RpiChristmasCountdown/img/santa128x11.png 128x11x24
+loaded /home/pi/RpiChristmasCountdown/img/stars512x32.png 512x32x24
+loaded /home/pi/RpiChristmasCountdown/img/tree9x10.png 9x10x24
+local: 2016-Dec-22 13:30:48
+party: 2016-Dec-24 16:00:00
+remaining hours: 50
+3.17.0
+This program uses FreeImage, a free, open source image library supporting all common bitmap formats. See http://freeimage.sourceforge.net for details
+loaded /home/pi/RpiChristmasCountdown/img/landscape512x32.png 4096x32x24
+loaded /home/pi/RpiChristmasCountdown/img/portal25x13.png 25x13x24
+loaded /home/pi/RpiChristmasCountdown/img/santa128x11.png 128x11x24
+loaded /home/pi/RpiChristmasCountdown/img/stars512x32.png 512x32x24
+loaded /home/pi/RpiChristmasCountdown/img/tree9x10.png 9x10x24
+local: 2016-Dec-22 15:33:59
+party: 2016-Dec-24 16:00:00
+remaining hours: 48
+3.17.0
+This program uses FreeImage, a free, open source image library supporting all common bitmap formats. See http://freeimage.sourceforge.net for details
+loaded /home/pi/RpiChristmasCountdown/img/landscape512x32.png 4096x32x24
+loaded /home/pi/RpiChristmasCountdown/img/santa128x11.png 128x11x24
+local: 2016-Dec-22 16:37:40
+party: 2016-Dec-24 16:00:00
+remaining hours: 47
+3.17.0
+This program uses FreeImage, a free, open source image library supporting all common bitmap formats. See http://freeimage.sourceforge.net for details
+loaded /home/pi/RpiChristmasCountdown/img/landscape512x32.png 4096x32x24
+loaded /home/pi/RpiChristmasCountdown/img/santa128x11.png 128x11x24
+local: 2016-Dec-24 20:42:44
+party: 2016-Dec-26 16:00:00
+remaining hours: 43
+3.17.0
+This program uses FreeImage, a free, open source image library supporting all common bitmap formats. See http://freeimage.sourceforge.net for details
+loaded /home/pi/RpiChristmasCountdown/img/landscape512x32.png 4096x32x24
+loaded /home/pi/RpiChristmasCountdown/img/santa128x11.png 128x11x24
+local: 2017-Jan-03 22:17:12
+party: 2016-Dec-26 16:00:00
+remaining hours: -198
+3.17.0
+This program uses FreeImage, a free, open source image library supporting all common bitmap formats. See http://freeimage.sourceforge.net for details
+loaded /home/pi/RpiChristmasCountdown/img/landscape512x32.png 4096x32x24
+loaded /home/pi/RpiChristmasCountdown/img/santa128x11.png 128x11x24
+local: 2017-Oct-28 17:08:10
+party: 2016-Dec-26 16:00:00
+remaining hours: -7345
