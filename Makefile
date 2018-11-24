@@ -1,4 +1,4 @@
-CFLAGS=-Wall -O3 -g
+CFLAGS=-Wall -O3 -g -J4
 CXXFLAGS=$(CFLAGS)
 OBJECTS=countdown.o 
 BINARIES=countdown
