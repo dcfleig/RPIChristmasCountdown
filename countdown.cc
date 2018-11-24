@@ -299,7 +299,7 @@ int main(int argc, char *argv[])
 
 	const Color yellow(235, 235, 0);
 	const Color red(255, 0, 0);
-	const Color green(0, 235, 0);
+	const Color green(0, 205, 0);
 	const Color white(235, 235, 235);
 
 	FIBITMAP *view = NULL;
@@ -324,13 +324,14 @@ int main(int argc, char *argv[])
 
 	// Top-right corners of each interval section
 	// Allows tighter spacing than the usual char kerning
-	int day_x = 2;
-	int hr_x = 28;
-	int min_x = 62;
-	int sec_x = 96;
+	int day_x = 1;
+	int hr_x = 33;
+	int min_x = 65;
+	int sec_x = 97;
 
-	int char_y = canvas->height()  - (tFont.baseline() / 2);
-
+	// Center the vertical position of the text
+	int char_y = canvas->height()  - (tFont.baseline() / 2) - 6;
+	
 	while (!interrupt_received)
 	{
 
@@ -378,7 +379,7 @@ int main(int argc, char *argv[])
 								 letter_spacing - 2);
 			rgb_matrix::DrawText(canvas, tFont,
 								 day_x, char_y,
-								 red, NULL, days,
+								 green, NULL, days,
 								 letter_spacing);
 
 			// Hours
@@ -388,7 +389,7 @@ int main(int argc, char *argv[])
 								 letter_spacing - 2);
 			rgb_matrix::DrawText(canvas, tFont,
 								 hr_x, char_y,
-								 red, NULL, hours,
+								 green, NULL, hours,
 								 letter_spacing);
 
 			// Minutes
@@ -398,7 +399,7 @@ int main(int argc, char *argv[])
 								 letter_spacing - 2);
 			rgb_matrix::DrawText(canvas, tFont,
 								 min_x, char_y,
-								 red, NULL, mins,
+								 green, NULL, mins,
 								 letter_spacing);
 
 			// Seconds
@@ -408,7 +409,7 @@ int main(int argc, char *argv[])
 								 letter_spacing - 2);
 			rgb_matrix::DrawText(canvas, tFont,
 								 sec_x, char_y,
-								 red, NULL, secs,
+								 green, NULL, secs,
 								 letter_spacing);
 
 			remaining = partyTime - second_clock::local_time();
