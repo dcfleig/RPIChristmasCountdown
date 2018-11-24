@@ -4,3 +4,6 @@
 [submodule "FreeImage"]
 	path = FreeImage
 	url = https://github.com/imazen/freeimage.git
+[submodule "rpi-rgb-led-matrix"]
+	path = rpi-rgb-led-matrix
+	url = https://github.com/hzeller/rpi-rgb-led-matrix.git
