@@ -36,29 +36,29 @@ static void InterruptHandler(int signo) {
   interrupt_received = true;
 }
 
-ptime partyTime(time_from_string("2017-12-24 16:30:00.000"));
+ptime partyTime(time_from_string("2018-12-24 16:30:00.000"));
 //ptime partyTime(second_clock::local_time() + seconds(3));
 
 int letter_spacing = 0;
 
-const char* countdownImages_fn = "/home/pi/RpiChristmasCountdown/img/countdown.png";
+const char* countdownImages_fn = "/home/pi/RPIChristmasCountdown/img/countdown.png";
 FIBITMAP *countdownImages = NULL;
 const int countdown_frame_width = 128;
 
-const char* landscape_fn = "/home/pi/RpiChristmasCountdown/img/landscape512x32.png";
+const char* landscape_fn = "/home/pi/RPIChristmasCountdown/img/landscape512x32.png";
 FIBITMAP *landscape = NULL;
 
-const char* merryChristmas_fn = "/home/pi/RpiChristmasCountdown/img/MerryChristmas.png";
+const char* merryChristmas_fn = "/home/pi/RPIChristmasCountdown/img/MerryChristmas.png";
 FIBITMAP *merryChristmas = NULL;
 
-const char* santa_fn = "/home/pi/RpiChristmasCountdown/img/santa128x11.png";
+const char* santa_fn = "/home/pi/RPIChristmasCountdown/img/santa128x11.png";
 FIBITMAP *santa = NULL;
 const int santa_frame_width = 16;
 const int santa_frame_height = 11;
 const int santa_frame_count = 8;
 
-const char *headerFont = "/home/pi/RpiChristmasCountdown/fonts/6x9.bdf";
-const char *timerFont = "/home/pi/RpiChristmasCountdown/fonts/10x20.bdf";
+const char *headerFont = "/home/pi/RPIChristmasCountdown/fonts/6x9.bdf";
+const char *timerFont = "/home/pi/RPIChristmasCountdown/fonts/10x20.bdf";
 
 enum mode { countdown_1, countdown_2, expired, idle};
 

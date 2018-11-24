@@ -9,7 +9,7 @@ touch /var/lock/santa
 case "$1" in
   start)
     echo "Starting script santa "
-    sudo /home/pi/RpiChristmasCountdown/countdown &
+    sudo /home/pi/RPIChristmasCountdown/countdown &
     #sudo /home/pi/rpi-rgb-led-matrix/examples-api-use/clock-dcf --led-chain=4 --led-rows=32 -C 0,0,255 -O 255,255,255 -b20 &
     ;;
   stop)
