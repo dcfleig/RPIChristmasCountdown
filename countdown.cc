@@ -37,9 +37,6 @@ static void InterruptHandler(int signo)
 	interrupt_received = true;
 }
 
-//ptime partyTime(time_from_string("2018-12-24 16:30:00.000"));
-//ptime partyTime(second_clock::local_time() + seconds(3));
-
 int letter_spacing = 0;
 
 const char *countdownImages_fn = "/home/pi/RPIChristmasCountdown/img/countdown.png";
@@ -49,6 +46,9 @@ const int countdown_frame_width = 128;
 const char *landscape_fn = "/home/pi/RPIChristmasCountdown/img/landscape512x32.png";
 FIBITMAP *landscape = NULL;
 
+const char *stars_fn = "/home/pi/RPIChristmasCountdown/img/stars512x32.png";
+FIBITMAP *stars = NULL;
+
 const char *merryChristmas_fn = "/home/pi/RPIChristmasCountdown/img/MerryChristmas.png";
 FIBITMAP *merryChristmas = NULL;
 
@@ -56,10 +56,10 @@ const char *santa_fn = "/home/pi/RPIChristmasCountdown/img/santa128x11.png";
 FIBITMAP *santa = NULL;
 const int santa_frame_width = 16;
 const int santa_frame_height = 11;
-const int santa_frame_count = 8;
+const int santa_frame_count = 7;
 
 const char *headerFont = "/home/pi/RPIChristmasCountdown/fonts/6x9.bdf";
-const char *timerFont = "/home/pi/RPIChristmasCountdown/fonts/10x20.bdf";
+const char *timerFont = "/home/pi/RPIChristmasCountdown/fonts/9x18.bdf";
 
 enum mode
 {
@@ -74,11 +74,11 @@ static int usage(const char *progname)
 	fprintf(stderr, "usage: %s -d <party start time> [optional matrix parameters]\n",
 			progname);
 	fprintf(stderr, "Options:\n");
-  fprintf(stderr,
-          "\t-d <date-time-string>  : Ex. \"2018-12-24 16:30:00.000\"\n");
-  rgb_matrix::PrintMatrixFlags(stderr);
+	fprintf(stderr,
+			"\t-d <date-time-string>  : Ex. \"2018-12-24 16:30:00.000\"\n");
+	rgb_matrix::PrintMatrixFlags(stderr);
 
-  return 1;
+	return 1;
 }
 
 // ----------------------------------------------------------
@@ -205,6 +205,17 @@ void LoadImages()
 		 << FreeImage_GetBPP(landscape)
 		 << endl;
 
+	stars = GenericLoader(stars_fn, 0);
+	cout << "loaded "
+		 << stars_fn
+		 << " "
+		 << FreeImage_GetWidth(stars)
+		 << "x"
+		 << FreeImage_GetHeight(stars)
+		 << "x"
+		 << FreeImage_GetBPP(stars)
+		 << endl;
+
 	santa = GenericLoader(santa_fn, 0);
 	cout << "loaded "
 		 << santa_fn
@@ -213,7 +224,7 @@ void LoadImages()
 		 << "x"
 		 << FreeImage_GetHeight(santa)
 		 << "x"
-		 << FreeImage_GetBPP(landscape)
+		 << FreeImage_GetBPP(santa)
 		 << endl;
 }
 
@@ -241,7 +252,7 @@ int main(int argc, char *argv[])
 	defaults.chain_length = 4;
 	defaults.parallel = 1;
 	defaults.show_refresh_rate = false;
-	defaults.brightness=50;
+	defaults.brightness = 50;
 	rgb_matrix::RuntimeOptions runtime_opt;
 
 	// First things first: extract the command line flags that contain
@@ -265,9 +276,9 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	RGBMatrix *matrix = CreateMatrixFromOptions(defaults, runtime_opt);
+	RGBMatrix *canvas = CreateMatrixFromOptions(defaults, runtime_opt);
 
-	FrameCanvas *canvas = matrix->CreateFrameCanvas();
+	FrameCanvas *offscreen_canvas = canvas->CreateFrameCanvas();
 
 	if (canvas == NULL)
 	{
@@ -324,20 +335,21 @@ int main(int argc, char *argv[])
 
 	// Top-right corners of each interval section
 	// Allows tighter spacing than the usual char kerning
-	int day_x = 1;
-	int hr_x = 33;
-	int min_x = 65;
-	int sec_x = 97;
+	int day_x = 2;
+	int hr_x = day_x + (canvas->width() / 4);
+	int min_x = hr_x + (canvas->width() / 4);
+	int sec_x = min_x + (canvas->width() / 4);
 
 	// Center the vertical position of the text
-	int char_y = canvas->height()  - (tFont.baseline() / 2) - 6;
-	
+	int char_y = canvas->height() - (tFont.baseline() / 2) - 10;
+
 	while (!interrupt_received)
 	{
+		offscreen_canvas->Clear();
 
 		counter++;
 
-		if (x >= FreeImage_GetWidth(landscape) - canvas->width())
+		if (x >= FreeImage_GetWidth(landscape) - offscreen_canvas->width())
 		{
 			x = 0;
 			counter = 0;
@@ -351,8 +363,10 @@ int main(int argc, char *argv[])
 		switch (display_mode)
 		{
 		case countdown_1:
-			view = FreeImage_CreateView(landscape, x, 0, x + canvas->width(), canvas->height());
-			DrawOnCanvas(canvas, view, 0, 0); // Using the canvas.
+			view = FreeImage_CreateView(landscape, x, 0, x + offscreen_canvas->width(), offscreen_canvas->height());
+			DrawOnCanvas(offscreen_canvas, view, 0, 0); // Using the canvas.
+			view = FreeImage_CreateView(landscape, x, 0, x + offscreen_canvas->width(), offscreen_canvas->height());
+			DrawOnCanvas(offscreen_canvas, view, 0, 0); // Using the canvas.
 			FreeImage_Unload(view);
 
 			// Format the interval parts
@@ -361,58 +375,48 @@ int main(int argc, char *argv[])
 			snprintf(mins, 4, "%02dm", remaining.minutes());
 			snprintf(secs, 4, "%02ds", remaining.seconds());
 
-			// int start_x = (canvas->width() - calcPixelWidthForString("30d20h10m20s", tFont))/2;
-
-			// rgb_matrix::DrawText(canvas, *tfont_outline_font,
-			// 					 start_x - 1, char_y,
-			// 					 white, NULL, "30d20h10m20s",
-			// 					 letter_spacing - 2);
-			// rgb_matrix::DrawText(canvas, tFont,
-			// 					 start_x, char_y,
-			// 					 red, NULL, "30d20h10m20s",
-			// 					 letter_spacing);
-
 			// Days
-			rgb_matrix::DrawText(canvas, *tfont_outline_font,
+			rgb_matrix::DrawText(offscreen_canvas, *tfont_outline_font,
 								 day_x - 1, char_y,
 								 white, NULL, days,
 								 letter_spacing - 2);
-			rgb_matrix::DrawText(canvas, tFont,
+			rgb_matrix::DrawText(offscreen_canvas, tFont,
 								 day_x, char_y,
 								 green, NULL, days,
 								 letter_spacing);
 
 			// Hours
-			rgb_matrix::DrawText(canvas, *tfont_outline_font,
+			rgb_matrix::DrawText(offscreen_canvas, *tfont_outline_font,
 								 hr_x - 1, char_y,
 								 white, NULL, hours,
 								 letter_spacing - 2);
-			rgb_matrix::DrawText(canvas, tFont,
+			rgb_matrix::DrawText(offscreen_canvas, tFont,
 								 hr_x, char_y,
 								 green, NULL, hours,
 								 letter_spacing);
 
 			// Minutes
-			rgb_matrix::DrawText(canvas, *tfont_outline_font,
+			rgb_matrix::DrawText(offscreen_canvas, *tfont_outline_font,
 								 min_x - 1, char_y,
 								 white, NULL, mins,
 								 letter_spacing - 2);
-			rgb_matrix::DrawText(canvas, tFont,
+			rgb_matrix::DrawText(offscreen_canvas, tFont,
 								 min_x, char_y,
 								 green, NULL, mins,
 								 letter_spacing);
 
 			// Seconds
-			rgb_matrix::DrawText(canvas, *tfont_outline_font,
+			rgb_matrix::DrawText(offscreen_canvas, *tfont_outline_font,
 								 sec_x - 1, char_y,
 								 white, NULL, secs,
 								 letter_spacing - 2);
-			rgb_matrix::DrawText(canvas, tFont,
+			rgb_matrix::DrawText(offscreen_canvas, tFont,
 								 sec_x, char_y,
 								 green, NULL, secs,
 								 letter_spacing);
 
 			remaining = partyTime - second_clock::local_time();
+
 			if (remaining < seconds(11))
 			{
 				display_mode = countdown_2;
@@ -420,7 +424,7 @@ int main(int argc, char *argv[])
 
 			break;
 		case countdown_2:
-			canvas->Clear();
+			offscreen_canvas->Clear();
 			santa_x = 0 - santa_frame_width;
 			santa_y = 0 - santa_frame_height;
 			direction = 0;
@@ -434,7 +438,7 @@ int main(int argc, char *argv[])
 			}
 
 			countdown_view = FreeImage_CreateView(countdownImages, (remaining.seconds() - 1) * countdown_frame_width, 0, (remaining.seconds()) * countdown_frame_width, 32);
-			DrawOnCanvas(canvas, countdown_view, 0, 0);
+			DrawOnCanvas(offscreen_canvas, countdown_view, 0, 0);
 			FreeImage_Unload(countdown_view);
 
 			break;
@@ -442,8 +446,8 @@ int main(int argc, char *argv[])
 			santa_x = 0 - santa_frame_width;
 			santa_y = 0 - santa_frame_height;
 			direction = 0;
-			canvas->Clear();
-			DrawOnCanvas(canvas, merryChristmas, 0, 0);
+			offscreen_canvas->Clear();
+			DrawOnCanvas(offscreen_canvas, merryChristmas, 0, 0);
 
 			remaining = second_clock::local_time() - partyTime;
 			if (remaining > seconds(60))
@@ -452,8 +456,8 @@ int main(int argc, char *argv[])
 			}
 			break;
 		case idle:
-			view = FreeImage_CreateView(landscape, x, 0, x + canvas->width(), canvas->height());
-			DrawOnCanvas(canvas, view, 0, 0); // Using the canvas.
+			view = FreeImage_CreateView(landscape, x, 0, x + offscreen_canvas->width(), offscreen_canvas->height());
+			DrawOnCanvas(offscreen_canvas, view, 0, 0); // Using the canvas.
 			FreeImage_Unload(view);
 			direction = 1;
 			speed = 3;
@@ -472,9 +476,9 @@ int main(int argc, char *argv[])
 			}
 			santa_x = santa_x + (0 + (rand() % (int)(2 - 0 + 1) * direction));
 			santa_y = santa_y + (-1 + (rand() % (int)(1 - -1 + 1) * direction));
-			if (santa_x >= canvas->width() + santa_frame_width)
+			if (santa_x >= offscreen_canvas->width() + santa_frame_width)
 				santa_path = 99;
-			if (santa_y >= canvas->height() - santa_frame_height)
+			if (santa_y >= offscreen_canvas->height() - santa_frame_height)
 				santa_y--;
 			if (santa_x < 0 - santa_frame_width)
 				santa_path = 99;
@@ -491,7 +495,7 @@ int main(int argc, char *argv[])
 			if (counter % 4 == 0)
 				santa_x = santa_x + 1 * direction;
 			santa_y = 4 * sin(santa_x / 10) + 5;
-			if ((santa_x > canvas->width() + santa_frame_width))
+			if ((santa_x > offscreen_canvas->width() + santa_frame_width))
 				santa_path = 99;
 			break;
 		case 2:
@@ -504,7 +508,7 @@ int main(int argc, char *argv[])
 			if (counter % 4 == 0)
 				santa_x = santa_x + 1 * direction;
 			santa_y = 4 * sin(santa_x / 20) + 10;
-			if (santa_x > canvas->width() + santa_frame_width)
+			if (santa_x > offscreen_canvas->width() + santa_frame_width)
 				santa_path = 99;
 			break;
 		default:
@@ -517,14 +521,17 @@ int main(int argc, char *argv[])
 		if (santa_frame > santa_frame_count)
 			santa_frame = 0;
 
+		//santa_x = 10;
+		//santa_y = 10;
+		//santa_frame=7;
 		if (direction > 0)
 		{
 			santa_view = FreeImage_CreateView(santa, santa_frame_width * santa_frame, 0, santa_frame_width * (santa_frame + 1), santa_frame_height);
-			DrawOnCanvas(canvas, santa_view, santa_y, santa_x);
+			DrawOnCanvas(offscreen_canvas, santa_view, santa_y, santa_x);
 			FreeImage_Unload(santa_view);
 		}
 
-		canvas = matrix->SwapOnVSync(canvas);
+		offscreen_canvas = canvas->SwapOnVSync(offscreen_canvas);
 	};
 
 	// Animation finished. Shut down the RGB matrix.
