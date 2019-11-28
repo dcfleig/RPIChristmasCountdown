@@ -22,6 +22,8 @@
 #include "threaded-canvas-manipulator.h"
 #include "graphics.h"
 
+//#include "sparkle.h"
+
 using rgb_matrix::Canvas;
 using rgb_matrix::GPIO;
 using rgb_matrix::RGBMatrix;
@@ -45,9 +47,6 @@ const int countdown_frame_width = 128;
 
 const char *landscape_fn = "/home/pi/RPIChristmasCountdown/img/landscape512x32.png";
 FIBITMAP *landscape = NULL;
-
-const char *stars_fn = "/home/pi/RPIChristmasCountdown/img/stars512x32.png";
-FIBITMAP *stars = NULL;
 
 const char *merryChristmas_fn = "/home/pi/RPIChristmasCountdown/img/MerryChristmas.png";
 FIBITMAP *merryChristmas = NULL;
@@ -205,17 +204,6 @@ void LoadImages()
 		 << FreeImage_GetBPP(landscape)
 		 << endl;
 
-	stars = GenericLoader(stars_fn, 0);
-	cout << "loaded "
-		 << stars_fn
-		 << " "
-		 << FreeImage_GetWidth(stars)
-		 << "x"
-		 << FreeImage_GetHeight(stars)
-		 << "x"
-		 << FreeImage_GetBPP(stars)
-		 << endl;
-
 	santa = GenericLoader(santa_fn, 0);
 	cout << "loaded "
 		 << santa_fn
@@ -226,6 +214,7 @@ void LoadImages()
 		 << "x"
 		 << FreeImage_GetBPP(santa)
 		 << endl;
+
 }
 
 // int calcPixelWidthForString(const char *utf8_text, Font font) {
@@ -237,6 +226,7 @@ void LoadImages()
 // }
 
 // ----------------------------------------------------------
+
 
 int main(int argc, char *argv[])
 {
@@ -252,7 +242,7 @@ int main(int argc, char *argv[])
 	defaults.chain_length = 4;
 	defaults.parallel = 1;
 	defaults.show_refresh_rate = false;
-	defaults.brightness = 50;
+	defaults.brightness = 60;
 	rgb_matrix::RuntimeOptions runtime_opt;
 
 	// First things first: extract the command line flags that contain
@@ -279,6 +269,8 @@ int main(int argc, char *argv[])
 	RGBMatrix *canvas = CreateMatrixFromOptions(defaults, runtime_opt);
 
 	FrameCanvas *offscreen_canvas = canvas->CreateFrameCanvas();
+
+	//BunchOfSparkles sparkles(offscreen_canvas,20);
 
 	if (canvas == NULL)
 	{
@@ -312,6 +304,7 @@ int main(int argc, char *argv[])
 	const Color red(255, 0, 0);
 	const Color green(0, 205, 0);
 	const Color white(235, 235, 235);
+	Color fontColor = green;
 
 	FIBITMAP *view = NULL;
 	FIBITMAP *santa_view = NULL;
@@ -332,6 +325,7 @@ int main(int argc, char *argv[])
 	unsigned x = 0;
 	bool path_start = true;
 	mode display_mode = countdown_1;
+	//mode display_mode = expired;
 
 	// Top-right corners of each interval section
 	// Allows tighter spacing than the usual char kerning
@@ -342,6 +336,8 @@ int main(int argc, char *argv[])
 
 	// Center the vertical position of the text
 	int char_y = canvas->height() - (tFont.baseline() / 2) - 10;
+
+	int green_ctr=0;
 
 	while (!interrupt_received)
 	{
@@ -365,15 +361,19 @@ int main(int argc, char *argv[])
 		case countdown_1:
 			view = FreeImage_CreateView(landscape, x, 0, x + offscreen_canvas->width(), offscreen_canvas->height());
 			DrawOnCanvas(offscreen_canvas, view, 0, 0); // Using the canvas.
-			view = FreeImage_CreateView(landscape, x, 0, x + offscreen_canvas->width(), offscreen_canvas->height());
-			DrawOnCanvas(offscreen_canvas, view, 0, 0); // Using the canvas.
 			FreeImage_Unload(view);
 
 			// Format the interval parts
-			snprintf(days, 4, "%1dd", abs(remaining.hours() / 24));
+			snprintf(days, 4, "%02dd", abs(remaining.hours() / 24));
 			snprintf(hours, 4, "%02dh", abs(remaining.hours() % 24));
 			snprintf(mins, 4, "%02dm", remaining.minutes());
 			snprintf(secs, 4, "%02ds", remaining.seconds());
+
+			if (remaining < seconds(60))
+			{
+				fontColor = Color(0,green_ctr++,0);
+				if (green_ctr > 254) green_ctr = 0;
+			}
 
 			// Days
 			rgb_matrix::DrawText(offscreen_canvas, *tfont_outline_font,
@@ -382,7 +382,7 @@ int main(int argc, char *argv[])
 								 letter_spacing - 2);
 			rgb_matrix::DrawText(offscreen_canvas, tFont,
 								 day_x, char_y,
-								 green, NULL, days,
+								 fontColor, NULL, days,
 								 letter_spacing);
 
 			// Hours
@@ -392,7 +392,7 @@ int main(int argc, char *argv[])
 								 letter_spacing - 2);
 			rgb_matrix::DrawText(offscreen_canvas, tFont,
 								 hr_x, char_y,
-								 green, NULL, hours,
+								 fontColor, NULL, hours,
 								 letter_spacing);
 
 			// Minutes
@@ -402,7 +402,7 @@ int main(int argc, char *argv[])
 								 letter_spacing - 2);
 			rgb_matrix::DrawText(offscreen_canvas, tFont,
 								 min_x, char_y,
-								 green, NULL, mins,
+								 fontColor, NULL, mins,
 								 letter_spacing);
 
 			// Seconds
@@ -412,7 +412,7 @@ int main(int argc, char *argv[])
 								 letter_spacing - 2);
 			rgb_matrix::DrawText(offscreen_canvas, tFont,
 								 sec_x, char_y,
-								 green, NULL, secs,
+								 fontColor, NULL, secs,
 								 letter_spacing);
 
 			remaining = partyTime - second_clock::local_time();
@@ -450,10 +450,13 @@ int main(int argc, char *argv[])
 			DrawOnCanvas(offscreen_canvas, merryChristmas, 0, 0);
 
 			remaining = second_clock::local_time() - partyTime;
-			if (remaining > seconds(60))
-			{
-				display_mode = idle;
-			}
+			
+			//sparkles.Draw();
+
+			// if (remaining > seconds(60))
+			// {
+			// 	display_mode = idle;
+			// }
 			break;
 		case idle:
 			view = FreeImage_CreateView(landscape, x, 0, x + offscreen_canvas->width(), offscreen_canvas->height());
@@ -521,9 +524,6 @@ int main(int argc, char *argv[])
 		if (santa_frame > santa_frame_count)
 			santa_frame = 0;
 
-		//santa_x = 10;
-		//santa_y = 10;
-		//santa_frame=7;
 		if (direction > 0)
 		{
 			santa_view = FreeImage_CreateView(santa, santa_frame_width * santa_frame, 0, santa_frame_width * (santa_frame + 1), santa_frame_height);
