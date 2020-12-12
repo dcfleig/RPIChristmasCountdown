@@ -1,0 +1,15 @@
+[Unit]
+Description=Start the Christmas Countdown clock
+
+[Service]
+Type=simple
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=countdown
+ExecStart=/home/dfleig/RPIChristmasCountdown/countdown -d "2020-12-24 16:30:00.000" --led-slowdown-gpio=2
+Restart=always
+RestartSec=10
+
+
+[Install]
+WantedBy=multi-user.target
