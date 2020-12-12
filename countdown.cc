@@ -41,24 +41,24 @@ static void InterruptHandler(int signo)
 
 int letter_spacing = 0;
 
-const char *countdownImages_fn = "/home/pi/RPIChristmasCountdown/img/countdown.png";
+const char *countdownImages_fn = "/home/dfleig/RPIChristmasCountdown/img/countdown.png";
 FIBITMAP *countdownImages = NULL;
 const int countdown_frame_width = 128;
 
-const char *landscape_fn = "/home/pi/RPIChristmasCountdown/img/landscape512x32.png";
+const char *landscape_fn = "/home/dfleig/RPIChristmasCountdown/img/landscape512x32.png";
 FIBITMAP *landscape = NULL;
 
-const char *merryChristmas_fn = "/home/pi/RPIChristmasCountdown/img/MerryChristmas.png";
+const char *merryChristmas_fn = "/home/dfleig/RPIChristmasCountdown/img/MerryChristmas.png";
 FIBITMAP *merryChristmas = NULL;
 
-const char *santa_fn = "/home/pi/RPIChristmasCountdown/img/santa128x11.png";
+const char *santa_fn = "/home/dfleig/RPIChristmasCountdown/img/santa128x11.png";
 FIBITMAP *santa = NULL;
 const int santa_frame_width = 16;
 const int santa_frame_height = 11;
 const int santa_frame_count = 7;
 
-const char *headerFont = "/home/pi/RPIChristmasCountdown/fonts/6x9.bdf";
-const char *timerFont = "/home/pi/RPIChristmasCountdown/fonts/9x18.bdf";
+const char *headerFont = "/home/dfleig/RPIChristmasCountdown/fonts/6x9.bdf";
+const char *timerFont = "/home/dfleig/RPIChristmasCountdown/fonts/9x18.bdf";
 
 enum mode
 {
@@ -239,7 +239,8 @@ int main(int argc, char *argv[])
 	RGBMatrix::Options defaults;
 	defaults.hardware_mapping = "regular"; // or e.g. "adafruit-hat"
 	defaults.rows = 32;
-	defaults.chain_length = 4;
+	defaults.cols = 64;
+	defaults.chain_length = 2;
 	defaults.parallel = 1;
 	defaults.show_refresh_rate = false;
 	defaults.brightness = 60;
@@ -364,10 +365,10 @@ int main(int argc, char *argv[])
 			FreeImage_Unload(view);
 
 			// Format the interval parts
-			snprintf(days, 4, "%02dd", abs(remaining.hours() / 24));
-			snprintf(hours, 4, "%02dh", abs(remaining.hours() % 24));
-			snprintf(mins, 4, "%02dm", remaining.minutes());
-			snprintf(secs, 4, "%02ds", remaining.seconds());
+			snprintf(days, 4, "%02dd", int(abs(remaining.hours() / 24)));
+			snprintf(hours, 4, "%02dh", int(abs(remaining.hours() % 24)));
+			snprintf(mins, 4, "%02dm", int(remaining.minutes()));
+			snprintf(secs, 4, "%02ds", int(remaining.seconds()));
 
 			if (remaining < seconds(60))
 			{
